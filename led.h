@@ -1,8 +1,6 @@
 #ifndef LED_H_
 #define LED_H_
 
-##include "bit_manipulation.h"
-
 void init_leds()
 {
 	DDRH = 0xFF;
