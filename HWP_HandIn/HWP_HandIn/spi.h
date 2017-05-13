@@ -13,6 +13,6 @@
 #define SPI_CLOCK_PHASE_TRAILING 1
 
 void spi_init(uint8_t data_order, uint8_t mode, uint8_t polarity, uint8_t phase);
-uint8_t spi_send_byte(uint8_t);
+void spi_send_byte(uint8_t, void (*)(uint8_t*));
 
 #endif /* SPI_H_ */

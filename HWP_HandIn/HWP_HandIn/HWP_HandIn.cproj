@@ -54,6 +54,18 @@
     </com_atmel_avrdbg_tool_atmelice>
     <avrtoolinterface>JTAG</avrtoolinterface>
     <avrtoolinterfaceclock>200000</avrtoolinterfaceclock>
+    <com_atmel_avrdbg_tool_simulator>
+      <ToolOptions xmlns="">
+        <InterfaceProperties>
+        </InterfaceProperties>
+        <InterfaceName>
+        </InterfaceName>
+      </ToolOptions>
+      <ToolType xmlns="">com.atmel.avrdbg.tool.simulator</ToolType>
+      <ToolNumber xmlns="">
+      </ToolNumber>
+      <ToolName xmlns="">Simulator</ToolName>
+    </com_atmel_avrdbg_tool_simulator>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <ToolchainSettings>
@@ -142,6 +154,12 @@
     <Compile Include="display.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="DS1337.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="DS1337.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="main.c">
       <SubType>compile</SubType>
     </Compile>
@@ -152,6 +170,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="spi.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="twi.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="twi.h">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>

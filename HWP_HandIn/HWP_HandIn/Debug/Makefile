@@ -38,8 +38,10 @@ SUBDIRS :=
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
 ../display.c \
+../DS1337.c \
 ../main.c \
-../spi.c
+../spi.c \
+../twi.c
 
 
 PREPROCESSING_SRCS += 
@@ -50,23 +52,31 @@ ASM_SRCS +=
 
 OBJS +=  \
 display.o \
+DS1337.o \
 main.o \
-spi.o
+spi.o \
+twi.o
 
 OBJS_AS_ARGS +=  \
 display.o \
+DS1337.o \
 main.o \
-spi.o
+spi.o \
+twi.o
 
 C_DEPS +=  \
 display.d \
+DS1337.d \
 main.d \
-spi.d
+spi.d \
+twi.d
 
 C_DEPS_AS_ARGS +=  \
 display.d \
+DS1337.d \
 main.d \
-spi.d
+spi.d \
+twi.d
 
 OUTPUT_FILE_PATH +=HWP_HandIn.elf
 
@@ -82,6 +92,10 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
+
+
 
 
 

@@ -9,10 +9,10 @@
 #define SPI_MODE_SLAVE 0
 #define SPI_CLOCK_POLARITY_HIGH 1
 #define SPI_CLOCK_POLARITY_LOW 0
-#define SPI_CLOCK_PHASE_SAMPLE_LEADING 0
-#define SPI_CLOCK_PHASE_SAMPLE_TRAILING 1
+#define SPI_CLOCK_PHASE_LEADING 0
+#define SPI_CLOCK_PHASE_TRAILING 1
 
-void spi_init(uint8_t, uint8_t, uint8_t, uint8_t);
-uint8_t spi_send_byte(uint8_t);
+void spi_init(uint8_t data_order, uint8_t mode, uint8_t polarity, uint8_t phase);
+void spi_send_byte(uint8_t, void (*)(uint8_t*));
 
 #endif /* SPI_H_ */
