@@ -1,69 +1,75 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include <stdlib.h>
-
-static volatile uint8_t disp_value[4];
-static volatile uint8_t digit;
+#include "mcu.h"
 
 const uint8_t DIGIT[10] = { 0xFC, 0x60, 0xDA, 0xF2, 0x66, 0xB6, 0xBE, 0xE0, 0xFE, 0xF6 };
 
-ISR (TIMER1_COMPA_vect) 
+int8_t value_by_digits[4] = { -1, -1, -1, -1 };
+uint8_t current = 0;
+
+ISR(TIMER0_OVF_vect)
 {
-	uint8_t value = disp_value[digit];
-	for (int i = 0; i < 8; i++) {
-		if (value & 1) {
-			PORTB |= _BV(PB2);
+	TCNT0 = 136;
+
+	uint8_t digit_value = value_by_digits[current];
+	if(digit_value != -1) {
+		for (uint8_t i = 0; i < 8; i++) {
+			if (digit_value & 0x01)
+				SET_BIT(PORTB, PB2);
+			else
+				CLEAR_BIT(PORTB, PB2);
+
+			CLOCK_PIN(PORTB, PB1);
+			digit_value >>= 1;
 		}
-		else {
-			PORTB &= ~_BV(PB2);
-		}
-		PORTB |= _BV(PB1);
-		PORTB &= ~_BV(PB1);
-		value >>= 1;
+
+		PORTL &= ~0x0F;
+		CLOCK_PIN(PORTK, PK3);
+		PORTL = _BV(3 - current);
+
+		current = (current + 1) % 4;
 	}
-
-	PORTL &= ~0x0F;
-
-	PORTK |= _BV(PK3);
-	PORTK &= ~_BV(PK3);
-
-	PORTL = _BV(3 - digit);
-
-	digit = (digit + 1) % 4;
 }
 
-void init_7_segment() 
+void display_7_segment(float value, uint8_t no_of_decimals)
 {
-	TIMSK1 = _BV(OCIE1A); //Turn timer 1 interrupt
+	uint16_t pow_ten[] = { 1, 10, 100, 1000 };
+	uint32_t real = value * pow_ten[no_of_decimals];
 
-	OCR1A = 7200/240; //Interrupt frequency to 240 Hz
-	TCCR1B |= _BV(WGM12); //Run in CTC mode
-
-	DDRB = _BV(PB3) | _BV(PB2) | _BV(PB1); //MR, DS, SHCP to output
-	DDRK = _BV(PK3); //STCP to output
-	DDRL = _BV(PL0) | _BV(PL1) | _BV(PL2) | _BV(PL3); //PL0 .. PL3 to output
-	PORTB = _BV(PB3); // MR to high
+	for(int i = 0; i < 4; i++) {
+		uint8_t digit = (real / pow_ten[3 - i]) % 10;
+		value_by_digits[i] = DIGIT[digit] | (i == 3 - no_of_decimals);
+	}
 }
 
-void display_7_segment(float value, uint8_t no_of_decimals) 
+float counter = 0;
+ISR(TIMER1_OVF_vect)
 {
-	// convert float value to array of values which represent each digit
-	uint16_t n = round(value*pow(10, no_of_decimals));
-	for (int j = 3; j >=0; j--) {
-		disp_value[j] = DIGIT[n % 10];
-		n = div(n, 10).quot;
-	}
-
-	disp_value[3-no_of_decimals] |= 1; // place a decimal point
-	TCCR1B |= _BV(CS12) | _BV(CS10); //start timer, clk / 1024
+	TCNT1 = 58336;
+	display_7_segment(counter, 2);
+	counter += 0.01;
 }
 
 int main(void)
 {
 	sei();
-	init_7_segment();
+
+	DDRB = _BV(PB3) | _BV(PB2) | _BV(PB1);	// MR, DS, SHCP
+	DDRK = _BV(PK3);						// STCP to output
+	DDRL = 0x0F;							// PL0 .. PL3
+	PORTB = _BV(PB3);						// MR
+
 	display_7_segment(123.4, 1);
 
-    while (1);
-}
+	// Refreshes display
+	TCNT0 = 136;						// 120 ticks (240 Hz)
+	TCCR0B = _BV(CS02);					// 256 prescaler
+	TIMSK0 = _BV(TOIE0);				// Enable timer compare interrupt (8 bit)
 
+	// Updates shown value
+	TCNT1 = 58336;						// 7200 ticks (4 Hz)
+	TCCR1B |= _BV(CS12);				// 256 prescaler
+	TIMSK1 |= _BV(TOIE1);				// enable overflow interrupt
+
+	while (1);
+}
