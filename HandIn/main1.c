@@ -21,7 +21,7 @@ ISR(TIMER1_OVF_vect)
 
 void _timer_setup(uint8_t *dummy)
 {
-	TCNT1 = 51136;						// 14400 ticks (2 Hz)
+	TCNT1 = 51136;							// 14400 ticks (2 Hz)
 	TCCR1B |= _BV(CS12);				// 256 prescaler
 	TIMSK1 |= _BV(TOIE1);				// enable overflow interrupt (16 bit)
 }
@@ -31,11 +31,11 @@ void _set_time(uint8_t *dummy)
 	rtc_setTime(0, 0, 0, _timer_setup);
 }
 
-int main(void)r
+int main(void)
 {
 	sei();
 
 	rtc_init(_set_time);
-	
-    while (1);
+
+  while (1);
 }

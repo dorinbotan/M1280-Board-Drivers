@@ -3,7 +3,6 @@
 #include "mcu.h"
 #include <avr/interrupt.h>
 
-const uint8_t DISPLAY[4] = { PL3, PL0, PL1, PL2 };
 const uint8_t DIGIT[10] = { 0xFC, 0x60, 0xDA, 0xF2, 0x66, 0xB6, 0xBE, 0xE0, 0xFE, 0xF6 };
 
 uint8_t init = 0;
@@ -13,10 +12,10 @@ uint8_t current = 0;
 void _trigger(uint8_t *dummy)
 {
 	// Display value
-	CLEAR_BIT(PORTL, DISPLAY[current]);
+	PORTL &= ~0xFF;
 	CLOCK_PIN(PORTK, PK3);
 	SET_BIT(PORTL, current);
-	current = (curent + 1) % 4;
+	current = (current + 1) % 4;
 }
 
 ISR(TIMER0_OVF_vect)
